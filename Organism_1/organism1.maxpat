@@ -3,13 +3,13 @@
 		"fileversion" : 1,
 		"appversion" : 		{
 			"major" : 7,
-			"minor" : 3,
-			"revision" : 1,
+			"minor" : 2,
+			"revision" : 2,
 			"architecture" : "x64",
 			"modernui" : 1
 		}
 ,
-		"rect" : [ 34.0, 77.0, 1071.0, 969.0 ],
+		"rect" : [ 42.0, 85.0, 1071.0, 969.0 ],
 		"bglocked" : 0,
 		"openinpresentation" : 0,
 		"default_fontsize" : 12.0,
@@ -43,10 +43,9 @@
 					"numinlets" : 2,
 					"numoutlets" : 1,
 					"outlettype" : [ "" ],
-					"patching_rect" : [ 500.0, 10.0, 297.0, 22.0 ],
-					"presentation_rect" : [ 500.0, 8.0, 0.0, 0.0 ],
+					"patching_rect" : [ 500.0, 10.0, 418.0, 22.0 ],
 					"style" : "",
-					"text" : "url file:///D:/GitHub/Organisms/Organism_1/index.html"
+					"text" : "url file:///D:/FrancescoZambianchi/GitHub/Organisms/Organism_1/index.html"
 				}
 
 			}
@@ -71,9 +70,9 @@
 					"numinlets" : 1,
 					"numoutlets" : 1,
 					"outlettype" : [ "" ],
-					"patching_rect" : [ 10.0, 42.0, 882.0, 836.0 ],
+					"patching_rect" : [ 10.0, 41.0, 882.0, 836.0 ],
 					"rendermode" : 0,
-					"url" : "file:///C:/Users/Mike/Documents/GitHub/Organisms/Organism_1/index.html"
+					"url" : "file:///D:/FrancescoZambianchi/GitHub/Organisms/Organism_1/index.html"
 				}
 
 			}
