@@ -9,10 +9,12 @@ var organism = {
     maxVert: 40, 
     maxLines: 18,  //per quadrante
     flow: 0, 
-    flowVel: 0, 
+    flowVel: 0.005, 
     step: 0.05, 
     maxWidth: 150
 }
+var bars = []
+var vertV;
 //testing controls and visualizzione dati
 var maxVertSlider;
 var maxLinesSlider;
@@ -27,6 +29,15 @@ var flowVelP;
 var stepP;
 var maxWidthP;
 var fpsP;
+var swt;
+
+var widthOff = 0;
+var velOff = 0;
+
+window.max.bindInlet('cross', function (widthOffMax, velOffMax) {
+    widthOff = widthOffMax * 100;
+    velOff = velOffMax;
+});
 
 var controlsShowing = false;
 
@@ -35,21 +46,32 @@ var controlsShowing = false;
 function setup() {
     createCanvas(550, 500, WEBGL);
     background(100);
-    controlsInit();    
+    controlsInit(); 
+    
+    //generate bars
+    var bar1 = new Bar(-60, 0, -100, 30, height*2)
+    var bar2 = new Bar(100, 0, 100, 15, height*2)
+    var bar3 = new Bar(180, 0, 100, 10, height*2)
+    
+    //populate array
+    bars.push(bar1)
+    bars.push(bar2)
+    bars.push(bar3)
 }
+
 
 function draw() {
     
     controlsUpdate();
     
     //Increment flow
-    organism.flow += organism.flowVel;
+    organism.flow += (organism.flowVel + velOff);
     
     //Frame Refresh
     background(250);
     
     //Bars Formatting and Display
-    bars();
+    barsFun();
     
     //Rotation controls (mouse)
     rotateY(mouseRotY);
@@ -57,6 +79,7 @@ function draw() {
     
     //ORGANISM
     
+        
     //LOOP INTORNO A ASSE Y (linee)
     //Iterazione di ognuna delle prime 4 linee maxLines volte per quadrante
     for (var u = 0; u < organism.maxLines; u++) {
@@ -97,12 +120,14 @@ function draw() {
                 //Coordinata Y dei vertici
                 var y = organism.minY + k * (organism.maxY - organism.minY) / organism.maxVert;
                 
+                
+                
                 //Aumenta variable mlt proporzionalmente alla vicinanza della coordinata Y al centro dell'altezza dell'organismo
                 if (k >= 0 && k <= organism.maxVert / 2) {
-                    var mlt = map(k, 0, organism.maxVert / 2, 0, organism.maxWidth);
+                    var mlt = map(k, 0, organism.maxVert / 2, 0, organism.maxWidth + widthOff);
                 }
                 if (k >= organism.maxVert / 2 && k <= organism.maxVert) {
-                    var mlt = map(k, organism.maxVert / 2, organism.maxVert, organism.maxWidth, 0);
+                    var mlt = map(k, organism.maxVert / 2, organism.maxVert, organism.maxWidth + widthOff, 0);
                 }
                 
                 //Colora proporzionalmente a mlt
@@ -111,9 +136,33 @@ function draw() {
                 //Genera coordinate x e z con perlin Noise con step variabile flow globale variabile e li allontana dall'asse Y proporzionalmente a mlt
                 var x = noise((0.1 + organism.step * k) + organism.flow) * mlt;
                 var z = noise((0.1 + organism.step * k) + organism.flow) * mlt;
+                /*
+                vertV = createVector(x, z);
+                //console.log(vertV)
+                for (var n = 0; n < bars.length; n++) {
+                    let rRep = sqrt(sq(bars[n].width)*2)/2
                 
+                    if (dist(vertV.x, vertV.y, bars[n].x, bars[n].z) < rRep) {
+                        let vertInit = createVector(bars[n].x + rRep, bars[n].z)
+                        var alph = Math.acos(vertV.dot(vertInit) / (vertV.mag() * vertInit.mag()));//vertV.angleBetween(vertInit)
+                        var resVect = p5.Vector.fromAngle(radians(alph))
+                        resVect.sub(vertV)
+                        resVect.setMag(resVect.mag() * 0.8)
+                        swt = true
+                        break;
+                    } else {
+                        swt = false
+                    }
+                }
+                
+                if (swt){
+                    vertex(resVect.x * rotX, y, resVect.y * rotZ)
+                }else{ */
+                    vertex(x * rotX, y, z * rotZ)
+                //}
                 //Genera vertice
-                vertex(x * rotX, y, z * rotZ)
+                
+                //vertex(x * rotX, y, z * rotZ)
             }
             pop();
         }
@@ -121,22 +170,40 @@ function draw() {
     }
 }
 
+//bars constructor function
+function Bar(x, y, z, width, height) {
+    this.x = x;
+    this.y = y;
+    this.z = z;
+    this.width = width;
+    this.height = height;
+    
+    this.update = function() {
+        push()
+        translate(this.x, this.y, this.z)
+    }
+    
+    this.display = function() {
+        box(this.width, this.height)
+        pop()
+    }
+}
 
-function bars() {
+//Draws all the bars
+function barsFun() {
     push()
     //Formatting
     specularMaterial(200);
     pointLight(250, 250, 250, 100, 100, 0);
     //Displaying
-    translate(- 60, 0, -100)
-    box(-30, height*2);
-    translate(160, 0, 200)
-    box(10, height);
-    translate(80, 0, 0);
-    box(10, height);
+    for (var j = 0; j < bars.length; j++){
+        bars[j].update()
+        bars[j].display()
+    }
     pop()
 }
 
+//Interpolation switch function
 function interpShapeFun() {
     if (interpShape) {
             if (interpShape === 'points') {
