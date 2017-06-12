@@ -10,27 +10,36 @@ function controlsInit() {
     stepSlider = createSlider(0, 1, organism.step, 0.01);
     maxWidthP = createP('MaxWidth');
     maxWidthSlider = createSlider(1, 250, organism.maxWidth, 1);
+    maxYDislocP = createP('MaxY_Dislocation')
+    maxYDislocSlider = createSlider(0, 100, organism.maxYDisloc, 1)
     fpsP = createP('fps');
     interpRadio = createRadio();
     interpRadio.option("points");
     interpRadio.option("lines");
     interpRadio.option("normal");
-    maxVertSlider.position(0, height + 10 + 50);
-    maxLinesSlider.position(0, height + 60 + 50);
-    flowVelSlider.position(0, height + 110 + 50);
-    stepSlider.position(0, height + 160 + 50);
-    maxWidthSlider.position(0, height + 210 + 50);
-    maxVertP.position(0, height + 10 + 15);
-    maxLinesP.position(0, height + 60 + 15);
-    flowVelP.position(0, height + 110 + 15);
-    stepP.position(0, height + 160 + 15);
-    maxWidthP.position(0, height + 210 + 15);
-    fpsP.position(0, height + 260 + 15);
+    interpRadio.position(width, 0)
+    
+    maxVertSlider.position(width, 0 + 10 + 50);
+    maxLinesSlider.position(width, 0 + 60 + 50);
+    flowVelSlider.position(width, 0 + 110 + 50);
+    stepSlider.position(width, 0 + 160 + 50);
+    maxWidthSlider.position(width, 0 + 210 + 50);
+    maxYDislocSlider.position(width, 260 + 50)
+    
+    maxVertP.position(width, 0 + 10 + 15);
+    maxLinesP.position(width, 0 + 60 + 15);
+    flowVelP.position(width, 0 + 110 + 15);
+    stepP.position(width, 0 + 160 + 15);
+    maxWidthP.position(width, 0 + 210 + 15);
+    fpsP.position(width, 0 + 310 + 15);
+    maxYDislocP.position(width, 0 + 260 + 15)
+    
     maxVertSlider.hide();
     maxLinesSlider.hide();
     flowVelSlider.hide();
     stepSlider.hide();
     maxWidthSlider.hide();
+    maxYDislocSlider.hide();
     maxVertP.hide();
     maxLinesP.hide();
     flowVelP.hide();
@@ -38,6 +47,7 @@ function controlsInit() {
     maxWidthP.hide();
     fpsP.hide();
     interpRadio.hide(); 
+    maxYDislocP.hide();
 }   
 
 function controlsUpdate() {
@@ -46,6 +56,7 @@ function controlsUpdate() {
     organism.flowVel = flowVelSlider.value();
     organism.step = stepSlider.value();
     organism.maxWidth = maxWidthSlider.value();
+    organism.maxYDisloc = maxYDislocSlider.value();
     interpShape = interpRadio.value();
     
     //visualizzazione dati
@@ -54,6 +65,7 @@ function controlsUpdate() {
     flowVelP.html('FlowVel: ' + organism.flowVel);
     stepP.html('Step: ' + organism.step);
     maxWidthP.html('MaxWidth: ' + organism.maxWidth);
+    maxYDislocP.html('MaxY_Dislocation: ' + organism.maxYDisloc)
     fpsP.html('FPS: ' + frameRate());
     
 }
@@ -83,6 +95,8 @@ function keyboardControlsListen() {
             maxWidthP.show();
             fpsP.show();
             interpRadio.show();
+            maxYDislocSlider.show();
+            maxYDislocP.show();
         }
         else {
             maxVertSlider.hide();
@@ -90,6 +104,7 @@ function keyboardControlsListen() {
             flowVelSlider.hide();
             stepSlider.hide();
             maxWidthSlider.hide();
+            maxYDislocSlider.hide();
             maxVertP.hide();
             maxLinesP.hide();
             flowVelP.hide();
@@ -97,6 +112,7 @@ function keyboardControlsListen() {
             maxWidthP.hide();
             fpsP.hide();
             interpRadio.hide();
+            maxYDislocP.hide();
         }
     }
 }

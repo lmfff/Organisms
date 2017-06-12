@@ -4,14 +4,16 @@ var mouseRotX = 0;
 var mouseRotY = 0;
 var lp = true;
 var organism = {
-    minY: -200,
-    maxY: 200,
+    minY: -250,
+    maxY: 250,
     maxVert: 40, 
     maxLines: 18,  //per quadrante
     flow: 0, 
-    flowVel: 0.005, 
-    step: 0.05, 
-    maxWidth: 150
+    flowVel: 0.01, 
+    step: 0.02, 
+    maxWidth: 150,
+    yDisloc: 0,
+    maxYDisloc: 0
 }
 var bars = []
 var vertV;
@@ -30,13 +32,13 @@ var stepP;
 var maxWidthP;
 var fpsP;
 var swt;
-
 var widthOff = 0;
 var velOff = 0;
 
-window.max.bindInlet('cross', function (widthOffMax, velOffMax) {
-    widthOff = widthOffMax * 100;
-    velOff = velOffMax;
+window.max.bindInlet('cross', function (bass, middle, high) {
+    widthOff = bass * 200;
+    velOff = middle;
+    organism.yDisloc = high;
 });
 
 var controlsShowing = false;
@@ -44,7 +46,7 @@ var controlsShowing = false;
 
 
 function setup() {
-    createCanvas(550, 500, WEBGL);
+    createCanvas(800, 800, WEBGL);
     background(100);
     controlsInit(); 
     
@@ -87,7 +89,7 @@ function draw() {
                 
         //Change shape interpolation based on interpShape variable
         interpShapeFun();
-        
+        translate(0, organism.yDisloc * organism.maxYDisloc * random(-1, 1), 0)
         //Generate first 4 lines (1 per quadrante)
         for (var q = 0; q < 4; q++) {
             
