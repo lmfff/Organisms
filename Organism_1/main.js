@@ -13,7 +13,9 @@ var organism = {
     step: 0.02, 
     maxWidth: 150,
     yDisloc: 0,
-    maxYDisloc: 0
+    maxYDisloc: 0,
+    rtZ: 0,
+    trsY: 0
 }
 var bars = []
 var vertV;
@@ -24,7 +26,7 @@ var flowVelSlider;
 var stepSlider;
 var maxWidthSlider;
 var interpRadio;
-var interpShape = 'points';
+var interpShape = 'normal';
 var maxVertP;
 var maxLinesP;
 var flowVelP;
@@ -34,6 +36,11 @@ var fpsP;
 var swt;
 var widthOff = 0;
 var velOff = 0;
+var demoMode = false;
+
+window.max.bindInlet('demoMode', function (toggle) {
+    demoMode = !demoMode
+});
 
 window.max.bindInlet('cross', function (bass, middle, high) {
     widthOff = bass * 200;
@@ -41,12 +48,27 @@ window.max.bindInlet('cross', function (bass, middle, high) {
     organism.yDisloc = high;
 });
 
+if (!demoMode) {
+    window.max.bindInlet('nanokontrol', function (pot1, pot2, pot3, pot4, pot5, pot6, pot7) {
+        organism.step = map(pot1, 0, 127, 0, 1);
+        organism.maxY = map(pot2, 0, 127, 100, 400);
+        organism.maxWidth = map(pot3, 0, 127, 1, 250);
+        organism.maxYDisloc = map(pot4, 0, 127, 0, 100);
+        organism.flowVel = map(pot5, 0, 127, -0.5, 0.5);
+        organism.rtZ = map(pot6, 0, 127, 0, TAU);
+        organism.trsY = map(pot7, 0, 127, -200, 200);
+    });
+}
+
+
+
+
 var controlsShowing = false;
 
 
 
 function setup() {
-    createCanvas(800, 800, WEBGL);
+    createCanvas(800, 1080, WEBGL);
     background(100);
     controlsInit(); 
     
@@ -63,8 +85,11 @@ function setup() {
 
 
 function draw() {
-    
-    controlsUpdate();
+    if (demoMode){
+        organism.maxY = 250;
+        organism.trsY = -200;
+        controlsUpdate();
+    }
     
     //Increment flow
     organism.flow += (organism.flowVel + velOff);
@@ -76,11 +101,16 @@ function draw() {
     barsFun();
     
     //Rotation controls (mouse)
-    rotateY(mouseRotY);
-    rotateX(mouseRotX);
+    if (demoMode) {
+        rotateY(mouseRotY);
+        rotateX(mouseRotX);
+    } else {
+        rotateZ(organism.rtZ)
+    }
     
     //ORGANISM
     
+    translate(0, organism.trsY, 0)
         
     //LOOP INTORNO A ASSE Y (linee)
     //Iterazione di ognuna delle prime 4 linee maxLines volte per quadrante
@@ -228,9 +258,11 @@ function keyPressed() {
 }
 
 function mouseDragged() {
-    if (mouseX >= 0 && mouseX <= width && mouseY >= 0 && mouseY <= height) {
-        mouseRotX += map(mouseY, 0, width, 0, TAU / 32);
-        mouseRotY += map(mouseX, 0, height, 0, TAU / 32);
+    if(demoMode){
+        if (mouseX >= 0 && mouseX <= width && mouseY >= 0 && mouseY <= height) {
+            mouseRotX += map(mouseY, 0, width, 0, TAU / 32);
+            mouseRotY += map(mouseX, 0, height, 0, TAU / 32);
+        }
     }
 }
 
