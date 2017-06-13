@@ -4,8 +4,9 @@ var mouseRotX = 0;
 var mouseRotY = 0;
 var lp = true;
 var organism = {
-    minY: -250,
-    maxY: 250,
+    h: 500,
+    minY: - this.h/2,
+    maxY: this.h/2,
     maxVert: 40, 
     maxLines: 18,  //per quadrante
     flow: 0, 
@@ -15,7 +16,8 @@ var organism = {
     yDisloc: 0,
     maxYDisloc: 0,
     rtZ: 0,
-    trsY: 0
+    trsY: 0,
+    trsX: 0
 }
 var bars = []
 var vertV;
@@ -36,30 +38,61 @@ var fpsP;
 var swt;
 var widthOff = 0;
 var velOff = 0;
+var maxVelOff = 0;
 var demoMode = false;
 
-window.max.bindInlet('demoMode', function (toggle) {
-    demoMode = !demoMode
-});
+var debugMode = false; //SET IT TO FALSE WHEN USING IN MAX!!!
 
-window.max.bindInlet('cross', function (bass, middle, high) {
-    widthOff = bass * 200;
-    velOff = middle;
-    organism.yDisloc = high;
-});
-
-if (!demoMode) {
-    window.max.bindInlet('nanokontrol', function (pot1, pot2, pot3, pot4, pot5, pot6, pot7) {
-        organism.step = map(pot1, 0, 127, 0, 1);
-        organism.maxY = map(pot2, 0, 127, 100, 400);
-        organism.maxWidth = map(pot3, 0, 127, 1, 250);
-        organism.maxYDisloc = map(pot4, 0, 127, 0, 100);
-        organism.flowVel = map(pot5, 0, 127, -0.5, 0.5);
-        organism.rtZ = map(pot6, 0, 127, 0, TAU);
-        organism.trsY = map(pot7, 0, 127, -200, 200);
-    });
+if(debugMode) {
+    demoMode = true;
 }
 
+if(!debugMode) {
+        window.max.bindInlet('demoMode', function (toggle) {
+        demoMode = !demoMode
+    });
+
+    window.max.bindInlet('cross', function (bass, middle, high) {
+        widthOff = bass * 100;
+        velOff = middle * 20;
+        organism.yDisloc = high * 20;
+    });
+
+    if (!demoMode) {
+        window.max.bindInlet('nkPot', function (pot1, pot2, pot3, pot4, pot5, pot6, pot7) {
+            organism.step = map(pot1, 0, 127, 0, 1);
+            organism.h = map(pot2, 0, 127, 0, 1000);
+            organism.maxWidth = map(pot3, 0, 127, 1, 250);
+            organism.maxYDisloc = map(pot4, 0, 127, 0, 100);
+            organism.flowVel = map(pot5, 0, 127, -0.5, 0.5);
+            organism.rtZ = map(pot6, 0, 127, 0, TAU/2);
+            organism.trsX = map(pot7, 0, 127, -300, 300);
+        });
+    }
+
+    if (!demoMode) {
+        window.max.bindInlet('nkFad', function (fad1, fad2, fad3, fad4, fad5, fad6, fad7, fad8) {
+            organism.trsY = map(fad7, 0, 127, 300, -300);
+            maxVelOff = map(fad5, 0, 127, 0, 1)
+        });
+    }
+    
+    if (!demoMode) {
+        window.max.bindInlet('nkTrsp', function (stop, start, rec) {
+            if (stop) {
+                interpShape = 'points'
+            } else if (start) {
+                interpShape = 'lines'
+            } else if (rec) {
+                interpShape = 'normal'
+            } else {
+                interpShape = 'normal€'
+            }
+        });
+    }
+
+
+}
 
 
 
@@ -86,13 +119,16 @@ function setup() {
 
 function draw() {
     if (demoMode){
-        organism.maxY = 250;
-        organism.trsY = -200;
+        organism.h = 250;
+        organism.trsY = 0;
+        organism.trsX = 0;
         controlsUpdate();
+    }   else {
+        fpsP.html('FPS: ' + frameRate());
     }
     
     //Increment flow
-    organism.flow += (organism.flowVel + velOff);
+    organism.flow += (organism.flowVel + velOff * maxVelOff);
     
     //Frame Refresh
     background(250);
@@ -100,18 +136,21 @@ function draw() {
     //Bars Formatting and Display
     barsFun();
     
-    //Rotation controls (mouse)
+    
+    
+    //ORGANISM
+    
+    translate(organism.trsX, organism.trsY, 0)
+    
+    //Rotation controls
     if (demoMode) {
         rotateY(mouseRotY);
         rotateX(mouseRotX);
     } else {
         rotateZ(organism.rtZ)
     }
-    
-    //ORGANISM
-    
-    translate(0, organism.trsY, 0)
-        
+    organism.maxY = organism.h/2
+    organism.minY = -organism.h/2
     //LOOP INTORNO A ASSE Y (linee)
     //Iterazione di ognuna delle prime 4 linee maxLines volte per quadrante
     for (var u = 0; u < organism.maxLines; u++) {
@@ -168,7 +207,9 @@ function draw() {
                 //Genera coordinate x e z con perlin Noise con step variabile flow globale variabile e li allontana dall'asse Y proporzionalmente a mlt
                 var x = noise((0.1 + organism.step * k) + organism.flow) * mlt;
                 var z = noise((0.1 + organism.step * k) + organism.flow) * mlt;
+                
                 /*
+                SISTEMA FISICO FALLIMENTARE
                 vertV = createVector(x, z);
                 //console.log(vertV)
                 for (var n = 0; n < bars.length; n++) {
@@ -190,10 +231,11 @@ function draw() {
                 if (swt){
                     vertex(resVect.x * rotX, y, resVect.y * rotZ)
                 }else{ */
-                    vertex(x * rotX, y, z * rotZ)
-                //}
-                //Genera vertice
                 
+                    vertex(x * rotX, y, z * rotZ)
+                
+                //}
+                //Genera vertice (SISTEMA FISICO FALLIMENTARE)
                 //vertex(x * rotX, y, z * rotZ)
             }
             pop();
