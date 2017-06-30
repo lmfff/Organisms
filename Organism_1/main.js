@@ -16,6 +16,7 @@ var organism = {
     yDisloc: 0,
     maxYDisloc: 0,
     rtZ: 0,
+    rtX: 0,
     trsY: 0,
     trsX: 0
 }
@@ -40,6 +41,9 @@ var widthOff = 0;
 var velOff = 0;
 var maxVelOff = 0;
 var demoMode = false;
+var leftOff = 0;
+var rightOff = 0;
+var stereoOff = 0;
 
 var debugMode = false; //SET IT TO FALSE WHEN USING IN MAX!!!
 
@@ -57,12 +61,17 @@ if(!debugMode) {
         velOff = middle * 20;
         organism.yDisloc = high * 20;
     });
+    
+    window.max.bindInlet('stereo', function (left, right) {
+        leftOff = left * 20;
+        rightOff = right * 20;
+    });
 
     if (!demoMode) {
         window.max.bindInlet('nkPot', function (pot1, pot2, pot3, pot4, pot5, pot6, pot7) {
             organism.step = map(pot1, 0, 127, 0, 1);
             organism.h = map(pot2, 0, 127, 0, 1000);
-            organism.maxWidth = map(pot3, 0, 127, 1, 250);
+            organism.rtX = map(pot3, 0, 127, 0, TAU/2);
             organism.maxYDisloc = map(pot4, 0, 127, 0, 100);
             organism.flowVel = map(pot5, 0, 127, -0.5, 0.5);
             organism.rtZ = map(pot6, 0, 127, 0, TAU/2);
@@ -72,6 +81,7 @@ if(!debugMode) {
 
     if (!demoMode) {
         window.max.bindInlet('nkFad', function (fad1, fad2, fad3, fad4, fad5, fad6, fad7, fad8) {
+            organism.maxWidth = map(fad2, 0, 127, 1, 250);
             organism.trsY = map(fad7, 0, 127, 300, -300);
             maxVelOff = map(fad5, 0, 127, 0, 1)
         });
@@ -101,7 +111,7 @@ var controlsShowing = false;
 
 
 function setup() {
-    createCanvas(800, 1080, WEBGL);
+    createCanvas(1920, 1080, WEBGL);
     background(100);
     controlsInit(); 
     
@@ -148,6 +158,7 @@ function draw() {
         rotateX(mouseRotX);
     } else {
         rotateZ(organism.rtZ)
+        rotateX(organism.rtX)
     }
     organism.maxY = organism.h/2
     organism.minY = -organism.h/2
@@ -168,18 +179,22 @@ function draw() {
             case 0:
                 rotX = 1;
                 rotZ = 1;
+                stereoOff = 0
                 break;
             case 1:
                 rotX = -1;
                 rotZ = 1;
+                stereoOff = leftOff
                 break;
             case 2:
                 rotX = -1;
                 rotZ = -1;
+                stereoOff = 0
                 break;
             case 3:
                 rotX = 1;
                 rotZ = -1;
+                stereoOff = rightOff
                 break;
             }
             
@@ -205,8 +220,8 @@ function draw() {
                 fill(mlt);
                 
                 //Genera coordinate x e z con perlin Noise con step variabile flow globale variabile e li allontana dall'asse Y proporzionalmente a mlt
-                var x = noise((0.1 + organism.step * k) + organism.flow) * mlt;
-                var z = noise((0.1 + organism.step * k) + organism.flow) * mlt;
+                var x = noise((0.1 + organism.step * k) + organism.flow + stereoOff) * mlt;
+                var z = noise((0.1 + organism.step * k) + organism.flow + stereoOff) * mlt;
                 
                 /*
                 SISTEMA FISICO FALLIMENTARE
