@@ -116,7 +116,11 @@ function setup() {
     controlsInit(); 
     
     //generate bars
-    var bar1 = new Bar(-60, 0, -100, 30, height*2)
+    /*for(var u = 0; u < 400; u++){
+        var bar = new Bar((u * width/400) - width/2, sin(map(u, 0, 399, 0, TAU*8))*height/2, 0, 5, 5)
+        bars.push(bar)
+    }
+    /*var bar1 = new Bar(-60, 0, -100, 30, height*2)
     var bar2 = new Bar(100, 0, 100, 15, height*2)
     var bar3 = new Bar(180, 0, 100, 10, height*2)
     
@@ -124,10 +128,12 @@ function setup() {
     bars.push(bar1)
     bars.push(bar2)
     bars.push(bar3)
+    */
 }
 
 
 function draw() {
+    
     if (demoMode){
         organism.h = 250;
         organism.trsY = 0;
@@ -260,6 +266,7 @@ function draw() {
 }
 
 //bars constructor function
+
 function Bar(x, y, z, width, height) {
     this.x = x;
     this.y = y;
@@ -273,10 +280,11 @@ function Bar(x, y, z, width, height) {
     }
     
     this.display = function() {
-        box(this.width, this.height)
+        sphere(this.width, this.height)
         pop()
     }
 }
+
 
 //Draws all the bars
 function barsFun() {
